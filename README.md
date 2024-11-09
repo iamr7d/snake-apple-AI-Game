@@ -25,6 +25,7 @@ A classic Snake game with AI-enabled features, built using Pygame.
 *   NumPy
 *   opencv-python
 *   mediapipe
+*   Tensorflow
 
 
 ## Installation
