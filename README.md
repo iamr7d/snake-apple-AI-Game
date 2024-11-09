@@ -12,7 +12,7 @@ A classic Snake game with AI-enabled features, built using Pygame.
 *   Classic Snake gameplay with score tracking
 *   AI-enabled features ✨ for enhanced gameplay
 *   Start screen with animation and blinking effect
-*   Smooth gameplay with 60 FPS
+*   Smooth gameplay with 120 FPS
 
 
 ## Requirements
@@ -42,7 +42,6 @@ A classic Snake game with AI-enabled features, built using Pygame.
 
 *   Arrow keys: Move 🐍 snake
 *   Space bar: Start game
-*   Escape key: Quit game
 *   Q key: Quit game
 
 
@@ -79,7 +78,7 @@ This project is licensed under the MIT License.
 -----------------
 
 
-*   v1.0.0: Initial release
+*   v2.0.0: Initial release
 
 
 Enjoy playing 🐍 Snake & Apple AI Game 🍎 with AI magic ✨!
