@@ -23,7 +23,13 @@ class PowerUpType(Enum):
 class GameState:
     def __init__(self):
         # Initialize pygame
+        # Initialize Pygame
         pygame.init()
+
+        # Set up display
+        #screen = pygame.display.set_mode((800, 600))
+        
+        pygame.display.set_caption("Snake & Apple AI Game")
         
         # Get the screen dimensions
         self.screen_info = pygame.display.Info()
@@ -107,11 +113,11 @@ class GameState:
                 return x, y
 
     def display_start_screen(self):
-        # Initialize game background
+        # Initialize game background and variables
         self.init_game_variables()
         self.display.fill((0, 0, 0))  # Black background
 
-        # Animation variables
+        # Title and subtitle animation variables
         title_y = -200
         subtitle_y = -150
         start_y = self.height / 2 + 100
@@ -120,6 +126,22 @@ class GameState:
         start_alpha = 0
         blink_visible = True
         blink_timer = 0
+
+        # Load snake and apple images
+        snake_image = pygame.font.SysFont("Arial", 50).render("🐍", True, (0, 255, 0))
+        apple_image = pygame.font.SysFont("Arial", 50).render("🍎", True, (255, 0, 0))
+
+        # Multiple flying snake and apple smileys
+        num_snakes = 5
+        num_apples = 5
+        snake_x = [random.randint(0, self.width) for _ in range(num_snakes)]
+        snake_y = [random.randint(0, self.height) for _ in range(num_snakes)]
+        snake_speed_x = [random.choice([-5, 5]) for _ in range(num_snakes)]
+        snake_speed_y = [random.choice([-5, 5]) for _ in range(num_snakes)]
+        apple_x = [random.randint(0, self.width) for _ in range(num_apples)]
+        apple_y = [random.randint(0, self.height) for _ in range(num_apples)]
+        apple_speed_x = [random.choice([-5, 5]) for _ in range(num_apples)]
+        apple_speed_y = [random.choice([-5, 5]) for _ in range(num_apples)]
 
         # Animation loop
         clock = pygame.time.Clock()
@@ -135,6 +157,29 @@ class GameState:
 
             # Clear screen
             self.display.fill((0, 0, 0))  # Black background
+
+            # Draw and update multiple flying snake and apple smileys
+            for i in range(num_snakes):
+                self.display.blit(snake_image, (snake_x[i], snake_y[i]))
+                snake_x[i] += snake_speed_x[i]
+                snake_y[i] += snake_speed_y[i]
+
+                # Bounce snake off edges
+                if snake_x[i] < 0 or snake_x[i] > self.width - 50:
+                    snake_speed_x[i] *= -1
+                if snake_y[i] < 0 or snake_y[i] > self.height - 50:
+                    snake_speed_y[i] *= -1
+
+            for i in range(num_apples):
+                self.display.blit(apple_image, (apple_x[i], apple_y[i]))
+                apple_x[i] += apple_speed_x[i]
+                apple_y[i] += apple_speed_y[i]
+
+                # Bounce apple off edges
+                if apple_x[i] < 0 or apple_x[i] > self.width - 50:
+                    apple_speed_x[i] *= -1
+                if apple_y[i] < 0 or apple_y[i] > self.height - 50:
+                    apple_speed_y[i] *= -1
 
             # Game Title
             font = pygame.font.SysFont("bahnschrift", 80, bold=True)
@@ -152,46 +197,40 @@ class GameState:
 
             # AI sparkle effect
             sparkle_font = pygame.font.SysFont("bahnschrift", 20, bold=True)
-            sparkle_text = sparkle_font.render("", True, (255, 255, 0))  # Yellow sparkles
-            sparkle_rect = sparkle_text.get_rect(center=(self.width / 2 + 120, subtitle_y - 10))
+            sparkle_text = sparkle_font.render("*", True, (255, 255, 0))  # Yellow sparkle
+            sparkle_rect = sparkle_text.get_rect(center=(self.width / 2 + 130, subtitle_y - 10))
             self.display.blit(sparkle_text, sparkle_rect)
-            sparkle_text = sparkle_font.render("", True, (255, 255, 0))  # Yellow sparkles
-            sparkle_rect = sparkle_text.get_rect(center=(self.width / 2 + 150, subtitle_y + 10))
+            sparkle_text = sparkle_font.render("*", True, (255, 255, 0))
+            sparkle_rect = sparkle_text.get_rect(center=(self.width / 2 + 115, subtitle_y))
             self.display.blit(sparkle_text, sparkle_rect)
 
-            # Start Text
-            start_text = font.render("Press Space to Start", True, (255, 255, 255))
-            start_text.set_alpha(start_alpha)
-            start_rect = start_text.get_rect(center=(self.width / 2, start_y))
-            if blink_visible:
-                self.display.blit(start_text, start_rect)
+            # Start text animation
+            start_font = pygame.font.SysFont("bahnschrift", 40)
+            start_text = start_font.render("Press SPACE to Start", True, (255, 255, 255))
+            start_text.set_alpha(start_alpha if blink_visible else 0)  # Blink effect
+            start_text_rect = start_text.get_rect(center=(self.width / 2, start_y))
+            self.display.blit(start_text, start_text_rect)
 
             # Update animation variables
-            title_y += 2
-            subtitle_y += 2
-            start_y -= 2
-            title_alpha += 5
-            subtitle_alpha += 5
-            start_alpha += 5
+            if title_y < self.height / 2 - 100:
+                title_y += 5
+                title_alpha = min(title_alpha + 5, 255)
+            if subtitle_y < self.height / 2 - 40:
+                subtitle_y += 5
+                subtitle_alpha = min(subtitle_alpha + 5, 255)
+            if start_alpha < 255:
+                start_alpha += 5
 
-            # Stop animation when text reaches final position
-            if title_y > self.height / 2 - 100:
-                title_y = self.height / 2 - 100
-                subtitle_y = self.height / 2 - 50
-                start_y = self.height / 2 + 100
-                title_alpha = 255
-                subtitle_alpha = 255
-                start_alpha = 255
-
-            # Blinking effect
+            # Blink timer
             blink_timer += 1
-            if blink_timer >= 30:  # Toggle visibility every 30 frames (0.5 seconds)
+            if blink_timer >= 30:
                 blink_visible = not blink_visible
                 blink_timer = 0
 
-            # Update display
+            # Update display and set frame rate
             pygame.display.update()
-            clock.tick(60)
+            clock.tick(30)
+
     def spawn_power_up(self):
         if len(self.power_ups) < 3:  # Limit number of power-ups on screen
             power_up = {
@@ -456,7 +495,7 @@ class GameState:
         """Handles game over screen."""
         
         # Fill screen with black
-        self.display.fill(self.COLORS['BLACK'])
+        self.display.fill(self.COLORS['RED'])
         
         # Render game over text
         font = pygame.font.SysFont("bahnschrift", 120)
